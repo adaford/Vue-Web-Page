@@ -1,0 +1,188 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <meta charset="utf-8">
+
+    <link rel="stylesheet" href="style.css">
+    <script src="http://code.jquery.com/jquery-3.3.1.min.js" integrity="sha256-FgpCb/KJQlLNfOu91ta32o/NMZxltwRo8QtmkMRdAu8=" crossorigin="anonymous"></script>
+    <script src="http://unpkg.com/vue"></script>
+    <title>Test Page</title>
+</head>
+
+<body>
+  <div id="my-vue-app" v-on:click = "qty">
+    <header>
+        <p class="title">Shopping Spree</p>
+        <div class="menu">
+            <span>Home</span>
+            <span>About</span>
+            <span>Products</span>
+            <span id="shopping-bag" v-on:mouseover="mouseOn" v-on:mouseleave="mouseOff">
+                <img id="bag" src="img/bag.png" alt="">
+                <span id="count">{{checkout.cartCount}}</span>
+                <div id="bag-open" :style = "checkout.show" >
+                  <!-- shopping bag item -->
+                  <div class="item" v-for = "item in openBag">
+                    <img class="prod-img" src="img/bp1.jpg" :style = "item.style" >
+                    <div class="desc">
+                      {{item.desc}}
+                    </div>
+                    <div class="info">
+                      Quantity: {{item.quantity}}<br>
+                      Cost: ${{item.cost}}
+                    </div>
+                  </div>
+                </div>
+            </span>
+        </div>
+    </header>
+    <div class="container">
+        <!-- images -->
+        <div class="image-col hue" :style = "defaultImg.hue">
+            <!-- main picture -->
+            <img id="default-img" :src= "defaultImg.src" />
+
+            <!-- thumbnails -->
+            <div class ="thumbnails" v-on:click="changePic" >
+                <img id="thumb1" :class="{ active: defaultImg.isActive[0] }" src="img/bp1.jpg" />
+                <img id="thumb2" :class="{ active: defaultImg.isActive[1] }" src="img/bp2.jpg" />
+                <img id="thumb3" :class="{ active: defaultImg.isActive[2] }" src="img/bp3.jpg" />
+                <img id="thumb4" :class="{ active: defaultImg.isActive[3] }" src="img/bp4.jpg" />
+            </div>
+        </div>
+
+        <!-- description -->
+        <div class="description-col">
+            <h2>Rugged Backpack</h2>
+            <b>Avg Rating:</b>
+            <ul class="stars">
+              <li><img class="star" src="img/star_filled.png"/></li>
+              <li><img class="star" src="img/star_filled.png"/></li>
+              <li><img class="star" src="img/star_filled.png"/></li>
+              <li><img class="star" src="img/star_filled.png"/></li>
+              <li><img class="star" src="img/star.png"/></li>
+            </ul>
+
+            <p>
+              <b>Your Rating:</b><br>
+              <span id="your-rating">
+                {{reviewForm.yourRating}}
+                <div v-if = "submittedReviews.length > 1">
+                  <ul class = "stars">
+                    <li><img class="star" :src= "submittedReviews[0].star[0]"/></li>
+                    <li><img class="star" :src= "submittedReviews[0].star[1]"/></li>
+                    <li><img class="star" :src= "submittedReviews[0].star[2]"/></li>
+                    <li><img class="star" :src= "submittedReviews[0].star[3]"/></li>
+                    <li><img class="star" :src= "submittedReviews[0].star[4]"/></li>
+                  </ul>
+                </div>
+              </span>
+            </p>
+
+            <p>
+                <b>Price:</b> $493.00
+            </p>
+
+            <p>
+              <b>Color:</b>
+            </p>
+            <div class="thumbnails" v-on:click = "changeColor">
+                <button class="color-thumb" :class="{ active: color.isActive[0] }" id="default-color">
+
+                </button>
+                <button class="color-thumb" :class="{ active: color.isActive[1] }" id="green-color">
+
+                </button>
+                <button class="color-thumb" :class="{ active: color.isActive[2] }" id="blue-color">
+
+                </button>
+                <button class="color-thumb" :class="{ active: color.isActive[3] }" id="pink-color">
+
+                </button>
+            </div>
+
+            <div id="buy-menu" v-on:click = "buyMenu">
+                <button id="add-qty" class="qty-btn">
+                    <span>+</span>
+                </button>
+
+                <input id="item-amount" v-model= "checkout.quantity" min=1 v-on:keyup = "qty">
+
+                <button id="sub-qty" class="qty-btn">
+                    <span>-</span>
+                </button>
+                <button id="add-cart">Add to Cart</button>
+            </div>
+
+            <div id="error-msg" :style = "checkout.valid">
+              Invalid Input!
+            </div>
+
+            <div class="description">
+                <h3>Description</h3>
+                <p>All-purpose rugged leather backpack with 3 storage compartments</p>
+                <ul>
+                    <li>Lorem ipsum dolor sit amet, consectetur adipiscing elit.</li>
+                    <li>Nullam a massa sed nibh vulputate interdum eget nec turpis.</li>
+                    <li>Morbi ultrices quam mi, in tempus neque pulvinar vel.</li>
+                    <li>Quisque ut tempus risus.</li>
+                    <li>Cras accumsan massa ex, ut sagittis nulla placerat eget.</li>
+                </ul>
+            </div>
+        </div>
+    </div>
+    <div class="review-container">
+        <hr />
+        <h1 id="review-title">Reviews</h1>
+        <div id="review-form">
+          <form id="new-review" v-on:click = "review" >
+            <fieldset :disabled = "reviewForm.locked">
+            Leave your own review<br/>
+            <ul class="stars">
+              <li><img class="star" id="1" :src="reviewForm.star[0]"/></li>
+              <li><img class="star" id="2" :src="reviewForm.star[1]"/></li>
+              <li><img class="star" id="3" :src="reviewForm.star[2]"/></li>
+              <li><img class="star" id="4" :src="reviewForm.star[3]"/></li>
+              <li><img class="star" id="5" :src="reviewForm.star[4]"/></li>
+            </ul>
+            <input required id="summary" type="text" placeholder="Review title" v-model = "reviewForm.title"/>
+
+            <textarea required placeholder="Type your review here" v-model = "reviewForm.rev"></textarea>
+            <input class="qty-btn btn" type="submit" val="Submit Review" />
+            </fieldset>
+          </form>
+        </div>
+        <div id="submitted-reviews">
+          <div class="review" v-for = "r in submittedReviews">
+            <h1 class="review-title">{{r.title}}</h1>
+            <ul class="stars">
+              <li><img class="star" :src="r.star[0]"/></li>
+              <li><img class="star" :src="r.star[1]"/></li>
+              <li><img class="star" :src="r.star[2]"/></li>
+              <li><img class="star" :src="r.star[3]"/></li>
+              <li><img class="star" :src="r.star[4]"/></li>
+            </ul>
+            <p>
+              {{r.rev}}
+            </p>
+            <div v-on:click = "editRev">
+              <button id="editReview" :style = "r.show"> 
+                Edit Review
+              </button>
+            </div>
+            <div v-on:click = "deleteRev">
+              <button id="deleteReview" :style = "r.show">
+                Delete Review
+              </button>
+            </div>
+          </div>
+        </div>
+
+    </div>
+    <footer></footer>
+  </div>
+</body>
+<script src="vue.js"></script>
+
+</html>
